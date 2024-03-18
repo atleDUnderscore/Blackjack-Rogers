@@ -13,15 +13,22 @@ public class BlackjackManager : MonoBehaviour
 
     [SerializeField] GameObject helpPanel;
     [SerializeField] GameObject gamePanel;
-    Card[] usedCards;
+    [SerializeField] GameObject cardPrefab;
+    Player player;
+    Computer com;
+    GameObject[] usedCards;
+
     int iRef;
+    int redoNumber;
+    string redoSuit;
+    //int maxCards = 5;
     // Start is called before the first frame update
     void Start()
     {
         helpPanel.SetActive(false);
         gamePanel.SetActive(false);
         iRef = 0;
-        usedCards = new Card[52];
+        usedCards = new GameObject[52];
     }
 
 
@@ -35,6 +42,7 @@ public class BlackjackManager : MonoBehaviour
     {
         Debug.Log("Plays videojuego");
         gamePanel.SetActive(true);
+
     }
 
     public void HelpLoad()
@@ -50,11 +58,35 @@ public class BlackjackManager : MonoBehaviour
         }
     }
 
+    /*public void Redo()
+    {
+        int rand = Random.Range(1, 3);
+        if(rand == 1)
+        {
+            Debug.Log("Same card different day");
+            Card card = new Card(redoNumber, redoSuit);
+            foreach (Card c in usedCards)
+            {
+                if (c.CardNumber == card.CardNumber && c.CardSuit == card.CardSuit)
+                {
+                    Debug.Log("Rerolled like kismet");
+                }
+            }
+        }
+        else if(rand == 2)
+        {
+            Debug.Log("New Card, not old card");
+            GenCard();
+        }
+        
+    }*/
+
     public void GenCard()
     {
-        int tempCardNum = Random.Range(0, 13);
+        int tempCardNum = Random.Range(1, 14);
         Debug.Log("Card Num: " + tempCardNum);
-        int tempCardSuitNum = Random.Range(0, 4);
+        redoNumber = tempCardNum;
+        int tempCardSuitNum = Random.Range(1, 5);
         Debug.Log("Card Suit: " + tempCardSuitNum);
         string tempCardSuit;
         if(tempCardSuitNum == 1)
@@ -77,17 +109,26 @@ public class BlackjackManager : MonoBehaviour
             tempCardSuit = "Diamonds";
             Debug.Log("Diamonds");
         }
-        Card card = new Card(tempCardNum, tempCardSuit);
-        if(usedCards.Contains(card))
+        redoSuit = tempCardSuit;
+        GameObject card = Instantiate(cardPrefab);
+        card.GetComponent<Card>().CardSetValue(tempCardNum, tempCardSuit);
+        
+        Debug.Log(card.GetComponent<Card>().CardSuit);
+        if (iRef > 0)
         {
-            GenCard();
-            Debug.Log("Rerolled like kismet");
+            Debug.Log(usedCards[0].ToString());
+            foreach (GameObject c in usedCards)
+            {
+                if (c.GetComponent<Card>().cardNumber == card.GetComponent<Card>().cardNumber && c.GetComponent<Card>().cardSuit == card.GetComponent<Card>().cardSuit)
+                {
+                    //GenCard();
+                    Debug.Log("Rerolled like kismet");
+                }
+            }
         }
-        else
-        {
-            usedCards[iRef] = card;
-            Debug.Log(card.CardNumber.ToString() + " of " + card.CardSuit);
-            iRef++;
-        }
+        usedCards[iRef] = card;
+
+        Debug.Log(card.GetComponent<Card>().CardNumber.ToString() + " of " + card.GetComponent<Card>().CardSuit);
+        iRef++;
     }
 }

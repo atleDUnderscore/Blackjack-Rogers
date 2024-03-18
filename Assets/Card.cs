@@ -2,12 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Card
+public class Card : MonoBehaviour
 {
-    int cardNumber;
-    string cardSuit;
+    public int cardNumber;
+    public string cardSuit;
 
     public Card(int cardNum, string cardSuite)
+    {
+        cardNumber = cardNum;
+        cardSuit = cardSuite;
+    }
+
+    public void CardSetValue(int cardNum, string cardSuite)
     {
         cardNumber = cardNum;
         cardSuit = cardSuite;

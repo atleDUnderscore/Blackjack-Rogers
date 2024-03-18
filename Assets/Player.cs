@@ -5,6 +5,14 @@ using UnityEngine;
 public class Player
 {
     int handTotal;
+    public Card[] hand;
+    int iRef;
+
+    //public Player(int handCount)
+    //{
+        //hand = new Card[handCount];
+        //iRef = 0;
+    //}
 
     int HandTotal
     {
@@ -16,5 +24,17 @@ public class Player
     public void SetHandZero()
     {
         handTotal = 0;
+        iRef = 0;
     }
+
+    public void AddToHand(Card card)
+    {
+        if(iRef <= hand.Length)
+        {
+            hand[iRef] = card;
+            iRef++;
+        }
+    }
+
+    
 }
