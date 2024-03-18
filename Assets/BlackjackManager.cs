@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+using TMPro;
 
 public class BlackjackManager : MonoBehaviour
 {
@@ -14,14 +15,16 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] GameObject helpPanel;
     [SerializeField] GameObject gamePanel;
     [SerializeField] GameObject cardPrefab;
+    [SerializeField] TMP_Text handText;
     Player player;
     Computer com;
     GameObject[] usedCards;
 
     int iRef;
+    int pRef;
     int redoNumber;
     string redoSuit;
-    //int maxCards = 5;
+    int maxCards = 5;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +32,8 @@ public class BlackjackManager : MonoBehaviour
         gamePanel.SetActive(false);
         iRef = 0;
         usedCards = new GameObject[52];
+        handText.text = "";
+        pRef = 0;
     }
 
 
@@ -42,6 +47,10 @@ public class BlackjackManager : MonoBehaviour
     {
         Debug.Log("Plays videojuego");
         gamePanel.SetActive(true);
+        player = new Player();
+        player.SetHandSize(maxCards);
+        AddToPlayer();
+        AddToPlayer();
 
     }
 
@@ -58,28 +67,39 @@ public class BlackjackManager : MonoBehaviour
         }
     }
 
-    /*public void Redo()
+    public void AddToPlayer()
     {
-        int rand = Random.Range(1, 3);
-        if(rand == 1)
+        if (pRef < 5)
         {
-            Debug.Log("Same card different day");
-            Card card = new Card(redoNumber, redoSuit);
-            foreach (Card c in usedCards)
-            {
-                if (c.CardNumber == card.CardNumber && c.CardSuit == card.CardSuit)
-                {
-                    Debug.Log("Rerolled like kismet");
-                }
-            }
-        }
-        else if(rand == 2)
-        {
-            Debug.Log("New Card, not old card");
+            GameObject c;
             GenCard();
+            c = usedCards[iRef - 1];
+            if (c.GetComponent<Card>().CardNumber == 1)
+            {
+                handText.text += (" Ace" + " of " + c.GetComponent<Card>().CardSuit);
+            }
+            else if (c.GetComponent<Card>().CardNumber == 11)
+            {
+                handText.text += (" Jack" + " of " + c.GetComponent<Card>().CardSuit);
+            }
+            else if (c.GetComponent<Card>().CardNumber == 12)
+            {
+                handText.text += (" Queen" + " of " + c.GetComponent<Card>().CardSuit);
+            }
+            else if (c.GetComponent<Card>().CardNumber == 13)
+            {
+                handText.text += (" Queen" + " of " + c.GetComponent<Card>().CardSuit);
+            }
+            else
+            {
+                handText.text += (" " + c.GetComponent<Card>().CardNumber.ToString() + " of " + c.GetComponent<Card>().CardSuit);
+            }
+            player.AddToHand(usedCards[iRef - 1]);
+            pRef++;
         }
         
-    }*/
+    }
+
 
     public void GenCard()
     {
@@ -119,11 +139,19 @@ public class BlackjackManager : MonoBehaviour
             Debug.Log(usedCards[0].ToString());
             foreach (GameObject c in usedCards)
             {
-                if (c.GetComponent<Card>().cardNumber == card.GetComponent<Card>().cardNumber && c.GetComponent<Card>().cardSuit == card.GetComponent<Card>().cardSuit)
+                if(c != null)
                 {
-                    //GenCard();
-                    Debug.Log("Rerolled like kismet");
+                    if (c.GetComponent<Card>().cardNumber == card.GetComponent<Card>().cardNumber && c.GetComponent<Card>().cardSuit == card.GetComponent<Card>().cardSuit)
+                    {
+                        //GenCard();
+                        Debug.Log("Rerolled like kismet");
+                    }
                 }
+                else if(c == null)
+                {
+                    Debug.Log("This b empty");
+                }
+                
             }
         }
         usedCards[iRef] = card;
