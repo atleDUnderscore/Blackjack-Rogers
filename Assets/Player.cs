@@ -14,7 +14,7 @@ public class Player
         iRef = 0;
     }*/
 
-    int HandTotal
+    public int HandTotal
     {
         get { return handTotal;}
         set { handTotal += value; }
@@ -39,6 +39,48 @@ public class Player
     public void SetHandSize(int size)
     {
         hand = new GameObject[size];
+    }
+
+    public void GetHandTotal()
+    {
+        handTotal = 0;
+        int tempAdd = 0;
+        GameObject[] tempAceArray = new GameObject[4];
+        int i = 0;
+        foreach (GameObject card in hand)
+        {
+            if(card != null)
+            {
+                if(card.GetComponent<Card>().CardNumber == 1)
+                {
+                    tempAceArray[i] = card;
+                    i++; 
+                }
+                else if(card.GetComponent<Card>().CardNumber == 11 || card.GetComponent<Card>().CardNumber == 12 || card.GetComponent<Card>().CardNumber == 13)
+                {
+                    tempAdd += 10;
+                }
+                else
+                {
+                    tempAdd += card.GetComponent<Card>().CardNumber;
+                }
+                
+            }
+        }
+        foreach(GameObject card in tempAceArray)
+        {
+            int tempAceTotalOne = tempAdd + 1;
+            int tempAceTotalElev = tempAdd + 11;
+            if (tempAceTotalElev > tempAceTotalOne && tempAceTotalElev <= 21)
+            {
+                tempAdd += 11;
+            }
+            else
+            {
+                tempAdd += 1;
+            }
+        }
+        handTotal = tempAdd;
     }
 
 

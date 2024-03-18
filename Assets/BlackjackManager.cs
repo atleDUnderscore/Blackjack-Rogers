@@ -16,12 +16,18 @@ public class BlackjackManager : MonoBehaviour
     [SerializeField] GameObject gamePanel;
     [SerializeField] GameObject cardPrefab;
     [SerializeField] TMP_Text handText;
+    [SerializeField] TMP_Text comHandText;
     Player player;
     Computer com;
     GameObject[] usedCards;
+    GameObject[] playerCardPos;
+    GameObject[] comCardPos;
 
     int iRef;
-    int pRef;
+    [SerializeField]int pRef;
+    int aRef;
+    int cRef;
+    int bRef;
     int redoNumber;
     string redoSuit;
     int maxCards = 5;
@@ -33,7 +39,14 @@ public class BlackjackManager : MonoBehaviour
         iRef = 0;
         usedCards = new GameObject[52];
         handText.text = "";
+        comHandText.text = "";
         pRef = 0;
+        cRef = 0;
+        bRef = 1;
+        aRef = 0;
+        playerCardPos = GameObject.FindGameObjectsWithTag("PlayerCard");
+        comCardPos = GameObject.FindGameObjectsWithTag("ComCard");
+
     }
 
 
@@ -48,9 +61,13 @@ public class BlackjackManager : MonoBehaviour
         Debug.Log("Plays videojuego");
         gamePanel.SetActive(true);
         player = new Player();
+        player.SetHandZero();
         player.SetHandSize(maxCards);
+        AddToCom();
+        AddToCom();
         AddToPlayer();
         AddToPlayer();
+        
 
     }
 
@@ -88,16 +105,51 @@ public class BlackjackManager : MonoBehaviour
             }
             else if (c.GetComponent<Card>().CardNumber == 13)
             {
-                handText.text += (" Queen" + " of " + c.GetComponent<Card>().CardSuit);
+                handText.text += (" King" + " of " + c.GetComponent<Card>().CardSuit);
             }
             else
             {
                 handText.text += (" " + c.GetComponent<Card>().CardNumber.ToString() + " of " + c.GetComponent<Card>().CardSuit);
             }
             player.AddToHand(usedCards[iRef - 1]);
+            player.SetHandZero();
+            player.GetHandTotal();
+            if (player.HandTotal > 21)
+            {
+                handText.text = "Busted";
+            }
             pRef++;
+            aRef++;
         }
         
+    }
+
+    public void AddToCom()
+    {
+        GameObject c;
+        GenComCard();
+        c = usedCards[iRef - 1];
+        if (c.GetComponent<Card>().CardNumber == 1)
+        {
+            comHandText.text += (" Ace" + " of " + c.GetComponent<Card>().CardSuit);
+        }
+        else if (c.GetComponent<Card>().CardNumber == 11)
+        {
+            comHandText.text += (" Jack" + " of " + c.GetComponent<Card>().CardSuit);
+        }
+        else if (c.GetComponent<Card>().CardNumber == 12)
+        {
+            comHandText.text += (" Queen" + " of " + c.GetComponent<Card>().CardSuit);
+        }
+        else if (c.GetComponent<Card>().CardNumber == 13)
+        {
+            comHandText.text += (" King" + " of " + c.GetComponent<Card>().CardSuit);
+        }
+        else
+        {
+            comHandText.text += (" " + c.GetComponent<Card>().CardNumber.ToString() + " of " + c.GetComponent<Card>().CardSuit);
+        }
+        bRef--;
     }
 
 
@@ -130,20 +182,21 @@ public class BlackjackManager : MonoBehaviour
             Debug.Log("Diamonds");
         }
         redoSuit = tempCardSuit;
-        GameObject card = Instantiate(cardPrefab);
+
+        GameObject card = Instantiate(cardPrefab, playerCardPos[aRef].transform.position, playerCardPos[aRef].transform.rotation, playerCardPos[aRef].transform.parent);
         card.GetComponent<Card>().CardSetValue(tempCardNum, tempCardSuit);
-        
+
+
         Debug.Log(card.GetComponent<Card>().CardSuit);
         if (iRef > 0)
         {
-            Debug.Log(usedCards[0].ToString());
             foreach (GameObject c in usedCards)
             {
                 if(c != null)
                 {
                     if (c.GetComponent<Card>().cardNumber == card.GetComponent<Card>().cardNumber && c.GetComponent<Card>().cardSuit == card.GetComponent<Card>().cardSuit)
                     {
-                        //GenCard();
+                        GenCard();
                         Debug.Log("Rerolled like kismet");
                     }
                 }
@@ -158,5 +211,69 @@ public class BlackjackManager : MonoBehaviour
 
         Debug.Log(card.GetComponent<Card>().CardNumber.ToString() + " of " + card.GetComponent<Card>().CardSuit);
         iRef++;
+        
+        
+        
+    }
+
+    public void GenComCard()
+    {
+        int tempCardNum = Random.Range(1, 14);
+        Debug.Log("Card Num: " + tempCardNum);
+        redoNumber = tempCardNum;
+        int tempCardSuitNum = Random.Range(1, 5);
+        Debug.Log("Card Suit: " + tempCardSuitNum);
+        string tempCardSuit;
+        if (tempCardSuitNum == 1)
+        {
+            tempCardSuit = "Spades";
+            Debug.Log("Spades");
+        }
+        else if (tempCardSuitNum == 2)
+        {
+            tempCardSuit = "Hearts";
+            Debug.Log("Hearts");
+        }
+        else if (tempCardSuitNum == 3)
+        {
+            tempCardSuit = "Clubs";
+            Debug.Log("Clubs");
+        }
+        else
+        {
+            tempCardSuit = "Diamonds";
+            Debug.Log("Diamonds");
+        }
+        redoSuit = tempCardSuit;
+
+        GameObject card = Instantiate(cardPrefab, comCardPos[bRef].transform.position, comCardPos[bRef].transform.rotation, comCardPos[bRef].transform.parent);
+        card.GetComponent<Card>().CardSetValue(tempCardNum, tempCardSuit);
+
+
+        Debug.Log(card.GetComponent<Card>().CardSuit);
+        if (iRef > 0)
+        {
+            foreach (GameObject c in usedCards)
+            {
+                if (c != null)
+                {
+                    if (c.GetComponent<Card>().cardNumber == card.GetComponent<Card>().cardNumber && c.GetComponent<Card>().cardSuit == card.GetComponent<Card>().cardSuit)
+                    {
+                        GenComCard();
+                        Debug.Log("Rerolled like kismet");
+                    }
+                }
+                else if (c == null)
+                {
+                    Debug.Log("This b empty");
+                }
+
+            }
+        }
+        usedCards[iRef] = card;
+
+        Debug.Log(card.GetComponent<Card>().CardNumber.ToString() + " of " + card.GetComponent<Card>().CardSuit);
+        iRef++;
+
     }
 }
