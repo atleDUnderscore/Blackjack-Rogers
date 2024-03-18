@@ -71,13 +71,16 @@ public class Player
         {
             int tempAceTotalOne = tempAdd + 1;
             int tempAceTotalElev = tempAdd + 11;
-            if (tempAceTotalElev > tempAceTotalOne && tempAceTotalElev <= 21)
+            if(card != null)
             {
-                tempAdd += 11;
-            }
-            else
-            {
-                tempAdd += 1;
+                if (tempAceTotalElev <= 21)
+                {
+                    tempAdd += 11;
+                }
+                else if (tempAceTotalElev > 21)
+                {
+                    tempAdd += 1;
+                }
             }
         }
         handTotal = tempAdd;
